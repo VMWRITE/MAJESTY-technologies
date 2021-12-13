@@ -498,7 +498,9 @@ typedef enum _PS_PROTECTED_SIGNER
 	PsProtectedSignerLsa = 4,
 	PsProtectedSignerWindows = 5,
 	PsProtectedSignerWinTcb = 6,
-	PsProtectedSignerMax = 7
+	PsProtectedSignerWinSystem = 7,
+	PsProtectedSignerApp = 8,
+	PsProtectedSignerMax = 9
 } PS_PROTECTED_SIGNER;
 
 typedef enum _PS_PROTECTED_TYPE
