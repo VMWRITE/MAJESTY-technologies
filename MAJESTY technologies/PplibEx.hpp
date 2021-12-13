@@ -28,11 +28,20 @@ namespace PplibEx
 				*(DWORD*)pPPL |= 1 << 0xB;
 			else if (version == WINDOWS_8)
 				*pPPL = true;
-			else if (version == WINDOWS_8_1 || version == WINDOWS_10 || version == WINDOWS_11)
+				else if (version == WINDOWS_8_1 )
 			{ 
 				PS_PROTECTION protection;
-				protection.Flags.Signer = PsProtectedSignerWinTcb;
-				protection.Flags.Type = PsProtectedTypeProtected;
+				protection.Flags.Signer = PsProtectedSignerWinSystem;// = PsProtectedSignerMax for Windows 8.1
+				protection.Flags.Type = PsProtectedTypeMax;
+				*pPPL = protection.Level;
+			}
+
+			// process hacker can't sea PsProtectedTypeMax  and write Unknown	? WTF?!
+			else if (version == WINDOWS_10 || version == WINDOWS_11)
+			{
+				PS_PROTECTION protection; 
+				protection.Flags.Signer = PsProtectedSignerMax;
+				protection.Flags.Type = PsProtectedTypeMax;
 				*pPPL = protection.Level;
 			}
 
