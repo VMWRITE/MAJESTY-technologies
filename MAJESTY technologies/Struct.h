@@ -515,21 +515,16 @@ typedef enum _PS_PROTECTED_TYPE
 
 struct DebugOffset
 {
+	
 	ULONG NoDebugInherit;
 	DWORD DebugPort;
 	ULONG HideFromDebugger;
 	DWORD InstrumentationCallback;
+	DWORD InheritedFromUniqueProcessId;
 };
 
 struct PprocOffset
 {
-	uint64_t name;
-	uint64_t pid;
-	uint64_t base;
-	uint64_t link;
 	uint64_t protection;
-	uint64_t flags2;
-	uint64_t objecttable;
-	uint64_t vadroot;
 
 };
