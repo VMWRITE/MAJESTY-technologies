@@ -50,7 +50,8 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 
 		Log("Is debug flag ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsProcessDebugFlag(xorstr("SexyTest.exe")));
 		 
-		 
+		 Log("Is under underExplorer ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsUnderExplorer(xorstr("SexyTest.exe")));
+
 
 		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(xorstr("SexyTest.exe")));
 
