@@ -76,6 +76,43 @@ namespace AntiDebug
 
 		}
 
+		
+		__forceinline	bool IsUnderExplorer(const char* procName)
+		{
+			 
+
+
+			bool underExplorer = false;
+			auto procID = PIDHelp::GetID(procName);
+
+			auto procIDExploler = PIDHelp::GetID(xorstr("explorer.exe"));
+
+			if (procID && procIDExploler)
+			{
+				PEPROCESS proc; 
+
+				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsLookupProcessByProcessId"));
+
+				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
+				{
+					auto uniqIdProc = *(uint64_t*)((uint64_t)proc + Offset::debugOffset.InheritedFromUniqueProcessId);
+					 
+
+					underExplorer = (uint64_t)procIDExploler != uniqIdProc;
+					 
+					
+
+					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ObfReferenceObject"));
+					myObfReferenceObject(proc); 
+				}
+			}
+			return underExplorer;
+
+		}
+
+		
+		
+		
 		__forceinline bool IsInstrCallbacks(const char* procName)
 		{
 			uint64_t IsInstEnable = 0;
