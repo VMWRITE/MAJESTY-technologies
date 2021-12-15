@@ -516,10 +516,11 @@ typedef enum _PS_PROTECTED_TYPE
 struct DebugOffset
 {
 	
-	ULONG NoDebugInherit;
+	DWORD NoDebugInherit;
 	DWORD DebugPort;
-	ULONG HideFromDebugger;
+	DWORD HideFromDebugger;
 	DWORD InstrumentationCallback;
+	DWORD InheritedFromUniqueProcessId;
 	DWORD InheritedFromUniqueProcessId;
 };
 
