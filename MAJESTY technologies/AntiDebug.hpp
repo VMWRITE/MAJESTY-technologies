@@ -76,7 +76,69 @@ namespace AntiDebug
 
 		}
 
-		
+		__forceinline bool SetManualHideThread(const char* procName )
+		{
+			ULONG Bytes;
+
+			auto procID = PIDHelp::GetID(procName);
+
+			auto ZwQuerySystemInformation = (t_ZwQuerySystemInformation)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ZwQuerySystemInformation"));
+
+			ZwQuerySystemInformation(SystemProcessInformation, NULL, NULL, &Bytes); 
+
+
+			auto ExAllocatePool = (t_ExAllocatePool)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ExAllocatePool"));
+
+			PSYSTEM_PROCESS_INFO ProcInfo = (PSYSTEM_PROCESS_INFO)ExAllocatePool(NonPagedPool, Bytes);
+
+			if (ProcInfo == NULL)
+				return false;
+
+			ApiWrapper::ZeroMemory(ProcInfo, Bytes);
+
+
+			auto ExFreePoolWithTag = (t_ExFreePoolWithTag)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ExFreePoolWithTag"));
+
+			if (!NT_SUCCESS(ZwQuerySystemInformation(SystemProcessInformation, ProcInfo, Bytes, &Bytes)))
+			{
+				ExFreePoolWithTag(ProcInfo,0 );
+				return false;
+			}
+
+			for (PSYSTEM_PROCESS_INFO Entry = ProcInfo; Entry->NextEntryOffset != NULL; Entry = (PSYSTEM_PROCESS_INFO)((UCHAR*)Entry + Entry->NextEntryOffset))
+			{
+				if (Entry->ProcessId == procID)
+				{
+					for (size_t i = 0; i < Entry->NumberOfThreads; i++)
+					{
+
+
+						PETHREAD Thread;
+
+
+						auto PsLookupThreadByThreadId = (t_PsLookupThreadByThreadId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupThreadByThreadId"));
+						
+
+						if (NT_SUCCESS(PsLookupThreadByThreadId(Entry->Threads[i].ClientId.UniqueThread, (PETHREAD*)&Thread)))
+						{
+							 
+							if ((*(ULONG*)((ULONG64)Thread + Offset::debugOffset.HideFromDebugger) & 0x4) == 0)
+							{
+								 *(ULONG*)((ULONG64)Thread + Offset::debugOffset.HideFromDebugger) ^= 4;
+							
+							}
+						}
+					}
+
+					ExFreePoolWithTag(ProcInfo,0);
+					return true;
+				}
+			}
+
+			ExFreePoolWithTag(ProcInfo,0);
+			return false;
+		}
+
 		__forceinline	bool IsUnderExplorer(const char* procName)
 		{
 			 
