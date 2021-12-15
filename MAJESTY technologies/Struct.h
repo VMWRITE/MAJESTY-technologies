@@ -521,7 +521,6 @@ struct DebugOffset
 	DWORD HideFromDebugger;
 	DWORD InstrumentationCallback;
 	DWORD InheritedFromUniqueProcessId;
-	DWORD InheritedFromUniqueProcessId;
 };
 
 struct PprocOffset
