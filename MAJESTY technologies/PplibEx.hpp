@@ -4,19 +4,20 @@
 
 
 
-// original https://github.com/notscimmy/pplib
+/*
+	original https://github.com/notscimmy/pplib
+
+	more info https://guidedhacking.com/threads/protected-processes-light-protected-processes.14968/
+
+*/
 namespace PplibEx
 {
 
-	void ProtectProcessByName(const char* procName)
+	__forceinline	void ProtectProcessByName(const char* procName)
 	{
-
-
-
-
 		PEPROCESS proc;
 		auto procID = PIDHelp::GetID(procName);
-		auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsLookupProcessByProcessId"));
+		auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
 
 		if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
 		{
@@ -28,7 +29,7 @@ namespace PplibEx
 				*(DWORD*)pPPL |= 1 << 0xB;
 			else if (version == WINDOWS_8)
 				*pPPL = true;
-				else if (version == WINDOWS_8_1 )
+			else if (version == WINDOWS_8_1 )
 			{ 
 				PS_PROTECTION protection;
 				protection.Flags.Signer = PsProtectedSignerWinSystem;// = PsProtectedSignerMax for Windows 8.1
@@ -44,8 +45,8 @@ namespace PplibEx
 				protection.Flags.Type = PsProtectedTypeMax;
 				*pPPL = protection.Level;
 			}
-
-			auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ObfReferenceObject"));
+			
+			auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
 			myObfReferenceObject(proc);
 		}
 

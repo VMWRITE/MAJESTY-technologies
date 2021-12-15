@@ -1,8 +1,6 @@
 #pragma once
 
 #include "GetPID.h"
-
-#include "AntiHypervisor.hpp"
 #include "Offset.hpp"
 
 namespace AntiDebug
@@ -22,7 +20,7 @@ namespace AntiDebug
 				PEPROCESS proc;
 
 
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsLookupProcessByProcessId"));
+				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
 
 				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
 				{
@@ -31,7 +29,7 @@ namespace AntiDebug
 
 
 
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ObfReferenceObject"));
+					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
 					myObfReferenceObject(proc);
 				}
 			}
@@ -54,28 +52,28 @@ namespace AntiDebug
 			*/
 
 
-			BYTE IsDebugFlag = 0;
+			processFlag2 IsDebugFlag ;
 			auto procID = PIDHelp::GetID(procName);
 			if (procID)
 			{
 				PEPROCESS proc;
 
 
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsLookupProcessByProcessId"));
+				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
 
 				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
 				{
-					IsDebugFlag = (*(ULONG*)((uint64_t)proc + Offset::debugOffset.NoDebugInherit)) & 0x2;
+					 IsDebugFlag = (*(processFlag2*)((uint64_t)proc + Offset::debugOffset.NoDebugInherit));
 
-
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ObfReferenceObject"));
+					
+					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
 					myObfReferenceObject(proc);
 				}
 			}
-			return IsDebugFlag != 0;
+			return IsDebugFlag.NoDebugInherit;
 
 		}
-
+		   
 		__forceinline bool SetManualHideThread(const char* procName )
 		{
 			ULONG Bytes;
@@ -139,6 +137,10 @@ namespace AntiDebug
 			return false;
 		}
 
+
+
+
+
 		__forceinline	bool IsUnderExplorer(const char* procName)
 		{
 			 
@@ -147,13 +149,13 @@ namespace AntiDebug
 			bool underExplorer = false;
 			auto procID = PIDHelp::GetID(procName);
 
-			auto procIDExploler = PIDHelp::GetID(xorstr("explorer.exe"));
+			auto procIDExploler = PIDHelp::GetID(xorstr_("explorer.exe"));
 
 			if (procID && procIDExploler)
 			{
 				PEPROCESS proc; 
 
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsLookupProcessByProcessId"));
+				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
 
 				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
 				{
@@ -164,7 +166,7 @@ namespace AntiDebug
 					 
 					
 
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ObfReferenceObject"));
+					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
 					myObfReferenceObject(proc); 
 				}
 			}
@@ -172,9 +174,9 @@ namespace AntiDebug
 
 		}
 
-		
-		
-		
+
+
+
 		__forceinline bool IsInstrCallbacks(const char* procName)
 		{
 			uint64_t IsInstEnable = 0;
@@ -184,21 +186,20 @@ namespace AntiDebug
 				PEPROCESS proc;
 
 
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsLookupProcessByProcessId"));
+				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
 
 				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
 				{
 					IsInstEnable = (*(uint64_t*)((uint64_t)proc + Offset::debugOffset.InstrumentationCallback));
 
 
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ObfReferenceObject"));
+					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
 					myObfReferenceObject(proc);
 				}
 			}
 			return IsInstEnable != 0;
 		}
-
-		
+		 
 	}
 	namespace AntiKernelDebug
 	{
@@ -208,7 +209,7 @@ namespace AntiDebug
 		__forceinline	bool DisableKernelDebug()
 		{
 
-			auto KdDisableDebugger = (t_KdDisableDebugger)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("KdDisableDebugger"));
+			auto KdDisableDebugger = (t_KdDisableDebugger)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("KdDisableDebugger"));
 			return KdDisableDebugger() != STATUS_DEBUGGER_INACTIVE;
 
 			// https://www.godeye.club/2021/06/03/002-mhyprot-insider-callbacks.html
@@ -223,7 +224,7 @@ namespace AntiDebug
 
 
 
-			auto ZwSystemDebugControl = (t_ZwSystemDebugControl)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("ZwSystemDebugControl"));
+			auto ZwSystemDebugControl = (t_ZwSystemDebugControl)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ZwSystemDebugControl"));
 			NTSTATUS status = ZwSystemDebugControl(
 				SysDbgBreakPoint,
 				0,
@@ -240,7 +241,7 @@ namespace AntiDebug
 		__forceinline	bool IsChangeOpthion()
 		{
 
-			auto KdChangeOption = (t_KdChangeOption)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("KdChangeOption"));
+			auto KdChangeOption = (t_KdChangeOption)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("KdChangeOption"));
 			auto status = KdChangeOption(KD_OPTION_SET_BLOCK_ENABLE, NULL, NULL, NULL, NULL, NULL);
 			return status != STATUS_DEBUGGER_INACTIVE;
 
@@ -254,7 +255,7 @@ namespace AntiDebug
 
 			auto kernelDebuggerPres = *(BYTE*)(0xFFFFF78000000000 + 0x02D4);
 
-			PBOOLEAN 	KdEnteredDebugger = (PBOOLEAN)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("KdEnteredDebugger"));
+			PBOOLEAN 	KdEnteredDebugger = (PBOOLEAN)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("KdEnteredDebugger"));
 
 			if (KdEnteredDebugger)
 			{

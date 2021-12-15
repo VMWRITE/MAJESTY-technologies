@@ -17,7 +17,7 @@ namespace PIDHelp
 		UINT OffsetActiveThreads = 0x0;
 
 
-		auto myPsInitialSystemProcess = (PDWORD64)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("PsInitialSystemProcess"));
+		auto myPsInitialSystemProcess = (PDWORD64)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsInitialSystemProcess"));
 
 
 

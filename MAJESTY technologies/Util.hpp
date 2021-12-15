@@ -3,13 +3,16 @@
 #include "ApiWrapper.hpp"
 
 
-#define Log(x,...)  Util::Print(xorstr(x), __VA_ARGS__)
+#define Log(x,...)  Util::Print(xorstr_(x), __VA_ARGS__)
 
 
 
 
 namespace Util
 {
+
+	 
+
 
 	__forceinline  ULONG KeMessageBox(PCWSTR title, PCWSTR text, ULONG_PTR type)
 	{
@@ -67,7 +70,7 @@ namespace Util
 
 		PDRIVER_OBJECT DiskDriver = NULL;
 
-		UNICODE_STRING  DriverName = ApiWrapper::InitUnicodeString(xorstr(L"\\Driver\\disk"));
+		UNICODE_STRING  DriverName = ApiWrapper::InitUnicodeString(xorstr_(L"\\Driver\\disk"));
 
 
 
@@ -118,24 +121,14 @@ namespace Util
 		va_start(args, text);
 
 
-		auto myvDbgPrintExWithPrefix = (t_vDbgPrintExWithPrefix)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("vDbgPrintExWithPrefix"));
-		auto result = myvDbgPrintExWithPrefix(xorstr("[sex technology] "), 0, 0, text, args);
+		auto myvDbgPrintExWithPrefix = (t_vDbgPrintExWithPrefix)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("vDbgPrintExWithPrefix"));
+		auto result = myvDbgPrintExWithPrefix(xorstr_("[sex technology] "), 0, 0, text, args);
 
 		va_end(args);
 		return result;
 
 	}
-
-	uintptr_t FindDMAAddy(uintptr_t ptr, uintptr_t offsets[], int lenght)
-	{
-		uintptr_t addr = ptr;
-		for (uintptr_t i = 0; i < lenght; ++i)
-		{
-			addr = *(uintptr_t*)addr;
-			addr += offsets[i];
-		}
-		return addr;
-	}
+	 
 
 	bool  CheckMask(const char* base, const char* pattern, const char* mask)
 	{

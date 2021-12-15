@@ -29,6 +29,9 @@
     <Filter Include="AntiReverse">
       <UniqueIdentifier>{78b18822-0940-453a-97a3-e3733b35acfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Asm">
+      <UniqueIdentifier>{8e8481b3-a740-4a86-ad82-63ebaaa99a9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="MAJESTYtechnologies.inf">
@@ -36,9 +39,6 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="XorStr.h">
-      <Filter>Obfuscathion</Filter>
-    </ClInclude>
     <ClInclude Include="Util.hpp">
       <Filter>Util</Filter>
     </ClInclude>
@@ -68,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="PplibEx.hpp">
       <Filter>AntiReverse</Filter>
+    </ClInclude>
+    <ClInclude Include="xor.h">
+      <Filter>Obfuscathion</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

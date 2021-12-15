@@ -46,18 +46,19 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 	{
 		
 		
-		Log("Is debug port ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::PsIsProcessBeingDebugged(xorstr("SexyTest.exe")));
+		Log("Is debug port ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::PsIsProcessBeingDebugged(xorstr_("SexyTest.exe")));
 
-		Log("Is debug flag ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsProcessDebugFlag(xorstr("SexyTest.exe")));
-		 
-		 Log("Is under underExplorer ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsUnderExplorer(xorstr("SexyTest.exe")));
+		Log("Is debug flag ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsProcessDebugFlag(xorstr_("SexyTest.exe")));
+		  
+		Log("Is under Explorer ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsUnderExplorer(xorstr_("SexyTest.exe")));
+
+
+		AntiDebug::AntiUserModeAntiDebug::SetManualHideThread(xorstr_("SexyTest.exe"));
+
 		
-		 Log("Manual set threadHideFromDebygger ->\t %x\n",AntiDebug::AntiUserModeAntiDebug::SetManualHideThread(xorstr_("SexyTest.exe")));
+		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(xorstr_("SexyTest.exe")));
 
-
-		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(xorstr("SexyTest.exe")));
-
-		 PplibEx::ProtectProcessByName(xorstr("SexyTest.exe"));
+		PplibEx::ProtectProcessByName(xorstr_("SexyTest.exe"));
 
 	}
 
@@ -77,10 +78,11 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 	Log("Check virtualizathion lbr ->\t %x\n", DetectHyp::lbr_is_virtulazed());
 	Log("Check stack lbr ->\t %x\n", DetectHyp::lbr_stask_is_virtulazed());
 
+	
 	Log("Time attack rdtsc ->\t %x\n", DetectHyp::time_attack_rdtsc());
 	Log("Time attack with APERF ->\t %x\n", DetectHyp::time_attack_APERF());
 	Log("Time attack with MPERF ->\t %x\n", DetectHyp::time_attack_MPERF());
-
+	
 
 
 	return STATUS_SUCCESS;

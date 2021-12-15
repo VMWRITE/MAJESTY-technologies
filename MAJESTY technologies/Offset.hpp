@@ -18,7 +18,7 @@ namespace Offset
 
 
 
-		auto   RtlGetVersion = (t_RtlGetVersion)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("RtlGetVersion"));
+		auto   RtlGetVersion = (t_RtlGetVersion)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("RtlGetVersion"));
 
 		if (RtlGetVersion)
 		{
@@ -26,7 +26,7 @@ namespace Offset
 		}
 		else
 		{
-			PDWORD64 buildNumber = (PDWORD64)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("NtBuildNumber"));
+			PDWORD64 buildNumber = (PDWORD64)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("NtBuildNumber"));
 
 			lpVersionInformation.dwBuildNumber = *buildNumber;
 			lpVersionInformation.dwMajorVersion = *(ULONG*)0xFFFFF7800000026C;
@@ -88,7 +88,7 @@ namespace Offset
 
 
 
-		auto   RtlGetVersion = (t_RtlGetVersion)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("RtlGetVersion"));
+		auto   RtlGetVersion = (t_RtlGetVersion)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("RtlGetVersion"));
 
 		if (RtlGetVersion)
 		{
@@ -96,7 +96,7 @@ namespace Offset
 		}
 		else
 		{
-			PDWORD64 buildNumber = (PDWORD64)Util::GetProcAddress(gl_baseNtoskrnl, xorstr("NtBuildNumber"));
+			PDWORD64 buildNumber = (PDWORD64)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("NtBuildNumber"));
 
 			lpVersionInformation.dwBuildNumber = *buildNumber;
 			lpVersionInformation.dwMajorVersion = *(ULONG*)0xFFFFF7800000026C;
@@ -115,6 +115,7 @@ namespace Offset
 
 			debugOffset.InheritedFromUniqueProcessId = 0x540;
 
+
 			ppOffset.protection = 0x87a;
 
 
@@ -131,7 +132,6 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x464;
 			debugOffset.InstrumentationCallback = 0x3d8;
 			debugOffset.InheritedFromUniqueProcessId = 0x540;
-
 
 			ppOffset.protection = 0x87a;
 
@@ -159,7 +159,6 @@ namespace Offset
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0;
 
-
 			ppOffset.protection = 0x6ca;
 
 
@@ -173,7 +172,6 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0;
-
 
 			ppOffset.protection = 0x6ca;
 
@@ -217,7 +215,6 @@ namespace Offset
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0;
 
-
 			ppOffset.protection = 0x6c2;
 
 
@@ -233,7 +230,6 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0;
-
 
 			ppOffset.protection = 0x6b2;
 
@@ -262,6 +258,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x2fc;
 			debugOffset.InstrumentationCallback = 0x2c0;
 			debugOffset.InheritedFromUniqueProcessId = 0x3d0;
+
 
 			ppOffset.protection = 0x67A;
 
@@ -294,10 +291,7 @@ namespace Offset
 			debugOffset.InstrumentationCallback = 0x100;
 			debugOffset.InheritedFromUniqueProcessId = 0x290;
 
-
 			ppOffset.protection = 0x43C;
-
-		}
 
 		}
 
