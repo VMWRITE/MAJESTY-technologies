@@ -41,16 +41,14 @@ namespace DetectHyp
 
 
 	bool   time_attack_rdtsc()
-	{
-		unsigned long  tick1 = 0;
-		unsigned long tick2 = 0;
-		unsigned long avg = 0;
+	{ 
+		uint64_t avg = 0;
 		int cpuInfo[4] = {};
 		for (int i = 0; i < 2500; i++)
 		{
-			tick1 = __readmsr(IA32_TIME_STAMP_COUNTER);
+			auto tick1 = __readmsr(IA32_TIME_STAMP_COUNTER);
 			__cpuid(cpuInfo, 0);// vm-exit
-			tick2 = __readmsr(IA32_TIME_STAMP_COUNTER);
+			auto tick2 = __readmsr(IA32_TIME_STAMP_COUNTER);
 			avg += (tick2 - tick1);
 		}
 		avg /= 2500;
@@ -83,14 +81,14 @@ namespace DetectHyp
 	bool time_attack_APERF()
 	{
 
-		DWORD64 avg{ 0 };
+		uint64_t avg{ 0 };
 		int data[4]{ -1 };
 
 		for (size_t i = 0; i < 2500; i++)
 		{
-			DWORD64 tick1 = __readmsr(IA32_APERF_MSR) << 32;
+			auto  tick1 = __readmsr(IA32_APERF_MSR) << 32;
 			__cpuid(data, 0); //call vm-exit
-			DWORD64 tick2 = __readmsr(IA32_APERF_MSR) << 32;
+			auto tick2 = __readmsr(IA32_APERF_MSR) << 32;
 
 			avg += (tick2 - tick1);
 
@@ -101,9 +99,9 @@ namespace DetectHyp
 
 	__forceinline bool lbr_is_virtulazed()
 	{
-		DWORD64 current_value = __readmsr(MSR_DEBUGCTL);//safe current value
+		auto current_value = __readmsr(MSR_DEBUGCTL);//safe current value
 		__writemsr(MSR_DEBUGCTL, DEBUGCTL_LBR | DEBUGCTL_BTF);
-		DWORD64 whatch_write = __readmsr(MSR_DEBUGCTL);
+		auto whatch_write = __readmsr(MSR_DEBUGCTL);
 		__writemsr(MSR_DEBUGCTL, current_value);
 		return (!(whatch_write & DEBUGCTL_LBR));
 	}

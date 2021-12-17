@@ -9,28 +9,24 @@ namespace AntiDebug
 	namespace AntiUserModeAntiDebug
 	{
 		//Just check DebugPort in PEPROCESS
-		__forceinline	bool PsIsProcessBeingDebugged(const char* procName)
+		__forceinline	bool PsIsProcessBeingDebugged(HANDLE procId)
 		{
 
 
-			uint64_t IsdebugPort = 0;
-			auto procID = PIDHelp::GetID(procName);
-			if (procID)
+			uint64_t IsdebugPort = 0; 
+			if (procId)
 			{
 				PEPROCESS proc;
 
 
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
-
-				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
+				 
+				if (NT_SUCCESS(PIDHelp::GetEProcessByProcId(procId, &proc)))
 				{
 
 					IsdebugPort = *(uint32_t*)((uint64_t)proc + Offset::debugOffset.DebugPort);
 
 
-
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
-					myObfReferenceObject(proc);
+					 
 				}
 			}
 			return IsdebugPort;
@@ -44,7 +40,7 @@ namespace AntiDebug
 
 
 		//Just check NoDebugInherit  in PEPROCESS
-		__forceinline	bool IsProcessDebugFlag(const char* procName)
+		__forceinline	bool IsProcessDebugFlag(HANDLE procId)
 		{
 			/*
 
@@ -52,33 +48,27 @@ namespace AntiDebug
 			*/
 
 
-			processFlag2 IsDebugFlag ;
-			auto procID = PIDHelp::GetID(procName);
-			if (procID)
+			processFlag2 IsDebugFlag{ 0 };
+			if (procId)
 			{
 				PEPROCESS proc;
 
-
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
-
-				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
+ 
+				if (NT_SUCCESS(PIDHelp::GetEProcessByProcId(procId, &proc)))
 				{
 					 IsDebugFlag = (*(processFlag2*)((uint64_t)proc + Offset::debugOffset.NoDebugInherit));
 
-					
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
-					myObfReferenceObject(proc);
+					 
 				}
 			}
 			return IsDebugFlag.NoDebugInherit;
 
 		}
 		   
-		__forceinline bool SetManualHideThread(const char* procName )
+		__forceinline bool SetManualHideThread(HANDLE procId )
 		{
 			ULONG Bytes;
-
-			auto procID = PIDHelp::GetID(procName);
+			 
 
 			auto ZwQuerySystemInformation = (t_ZwQuerySystemInformation)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ZwQuerySystemInformation"));
 
@@ -104,8 +94,8 @@ namespace AntiDebug
 			}
 
 			for (PSYSTEM_PROCESS_INFO Entry = ProcInfo; Entry->NextEntryOffset != NULL; Entry = (PSYSTEM_PROCESS_INFO)((UCHAR*)Entry + Entry->NextEntryOffset))
-			{
-				if (Entry->ProcessId == procID)
+			{ 
+				if (PIDHelp::GetEProcessByProcIdEx(Entry->ProcessId) == PIDHelp::GetEProcessByProcIdEx(procId))
 				{
 					for (size_t i = 0; i < Entry->NumberOfThreads; i++)
 					{
@@ -136,28 +126,23 @@ namespace AntiDebug
 			ExFreePoolWithTag(ProcInfo,0);
 			return false;
 		}
+		 
 
 
-
-
-
-		__forceinline	bool IsUnderExplorer(const char* procName)
+		__forceinline	bool IsUnderExplorer(HANDLE procId)
 		{
 			 
 
 
-			bool underExplorer = false;
-			auto procID = PIDHelp::GetID(procName);
+			bool underExplorer = false; 
 
-			auto procIDExploler = PIDHelp::GetID(xorstr_("explorer.exe"));
+			auto procIDExploler = PIDHelp::GetID(xorstr_("explorer.exe")); 
 
-			if (procID && procIDExploler)
+			if (procId && procIDExploler)
 			{
 				PEPROCESS proc; 
-
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
-
-				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
+ 
+				if (NT_SUCCESS(PIDHelp::GetEProcessByProcId(procId, &proc)))
 				{
 					auto uniqIdProc = *(uint64_t*)((uint64_t)proc + Offset::debugOffset.InheritedFromUniqueProcessId);
 					 
@@ -165,9 +150,7 @@ namespace AntiDebug
 					underExplorer = (uint64_t)procIDExploler != uniqIdProc;
 					 
 					
-
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
-					myObfReferenceObject(proc); 
+					 
 				}
 			}
 			return underExplorer;
@@ -177,24 +160,19 @@ namespace AntiDebug
 
 
 
-		__forceinline bool IsInstrCallbacks(const char* procName)
+		__forceinline bool IsInstrCallbacks(HANDLE procId)
 		{
-			uint64_t IsInstEnable = 0;
-			auto procID = PIDHelp::GetID(procName);
-			if (procID)
+			uint64_t IsInstEnable = 0; 
+			if (procId)
 			{
 				PEPROCESS proc;
 
 
-				auto PsLookupProcessByProcessId = (t_PsLookupProcessByProcessId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupProcessByProcessId"));
-
-				if (NT_SUCCESS(PsLookupProcessByProcessId(procID, &proc)))
+				if (NT_SUCCESS(PIDHelp::GetEProcessByProcId(procId, &proc)))
 				{
-					IsInstEnable = (*(uint64_t*)((uint64_t)proc + Offset::debugOffset.InstrumentationCallback));
+					IsInstEnable = *(uint64_t*)((uint64_t)proc + Offset::debugOffset.InstrumentationCallback);
 
 
-					auto myObfReferenceObject = (t_ObfReferenceObject)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ObfReferenceObject"));
-					myObfReferenceObject(proc);
 				}
 			}
 			return IsInstEnable != 0;
@@ -225,7 +203,7 @@ namespace AntiDebug
 
 
 			auto ZwSystemDebugControl = (t_ZwSystemDebugControl)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ZwSystemDebugControl"));
-			NTSTATUS status = ZwSystemDebugControl(
+			auto status = ZwSystemDebugControl(
 				SysDbgBreakPoint,
 				0,
 				0,
@@ -255,7 +233,7 @@ namespace AntiDebug
 
 			auto kernelDebuggerPres = *(BYTE*)(0xFFFFF78000000000 + 0x02D4);
 
-			PBOOLEAN 	KdEnteredDebugger = (PBOOLEAN)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("KdEnteredDebugger"));
+			auto 	KdEnteredDebugger = (PBOOLEAN)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("KdEnteredDebugger"));
 
 			if (KdEnteredDebugger)
 			{

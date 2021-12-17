@@ -42,23 +42,31 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 	gl_baseNtoskrnl = baseNtoskrnl;	//just set global value,because i lazy 
 
 
-	if (Offset::GetOffset() )
+
+	static HANDLE procId = PIDHelp::GetID("SexyTest.exe"); 
+
+	
+	
+		 
+	 if (Offset::GetOffset())
 	{
 		
 		
-		Log("Is debug port ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::PsIsProcessBeingDebugged(xorstr_("SexyTest.exe")));
+		Log("Is debug port ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::PsIsProcessBeingDebugged(procId));
 
-		Log("Is debug flag ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsProcessDebugFlag(xorstr_("SexyTest.exe")));
+		Log("Is debug flag ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsProcessDebugFlag(procId));
 		  
-		Log("Is under Explorer ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsUnderExplorer(xorstr_("SexyTest.exe")));
+		Log("Is under Explorer ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsUnderExplorer(procId));
+
+		 
 
 
-		AntiDebug::AntiUserModeAntiDebug::SetManualHideThread(xorstr_("SexyTest.exe"));
+		AntiDebug::AntiUserModeAntiDebug::SetManualHideThread(procId);
 
 		
-		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(xorstr_("SexyTest.exe")));
+		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(procId));
 
-		PplibEx::ProtectProcessByName(xorstr_("SexyTest.exe"));
+		PplibEx::ProtectProcessByPID(procId);
 
 	}
 
@@ -66,8 +74,7 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 	{
 		Log("Can't find offset!\n");
 	}
-
-
+	 
 	Log("KdChangeOpthion ->\t %x\n", AntiDebug::AntiKernelDebug::IsChangeOpthion());
 	Log("Disable kernel debugger ->\t %x\n", AntiDebug::AntiKernelDebug::DisableKernelDebug());
 	Log("ZwSystemDebugControl ->\t %x\n", AntiDebug::AntiKernelDebug::DebugTrigger());
@@ -83,7 +90,6 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 	Log("Time attack with APERF ->\t %x\n", DetectHyp::time_attack_APERF());
 	Log("Time attack with MPERF ->\t %x\n", DetectHyp::time_attack_MPERF());
 	
-
 
 	return STATUS_SUCCESS;
 

@@ -13,7 +13,6 @@
 #define WINDOWS_7_SP1 7601
 #define WINDOWS_8 9200
 #define WINDOWS_8_1 9600
-#define WINDOWS_10 10
 #define WINDOWS_10_VERSION_THRESHOLD1 10240
 #define WINDOWS_10_VERSION_THRESHOLD2 10586
 #define WINDOWS_10_VERSION_REDSTONE1 14393
@@ -30,6 +29,11 @@
 #define WINDOWS_11 22000
 
 
+#define WINDOWS_NUMBER_7 7
+#define WINDOWS_NUMBER_8 8
+#define WINDOWS_NUMBER_8_1 9
+#define WINDOWS_NUMBER_10 10
+#define WINDOWS_NUMBER_11 11
 
 #define IA32_P5_MC_ADDR_MSR		0x00000000
 #define DEBUGCTL_LBR            0x01
@@ -784,8 +788,9 @@ struct DebugOffset
 	DWORD DebugPort;
 	DWORD HideFromDebugger;
 	DWORD InstrumentationCallback;
-	DWORD InheritedFromUniqueProcessId; 
+	DWORD InheritedFromUniqueProcessId;  
 };
+
 
 struct PprocOffset
 {
@@ -850,6 +855,4 @@ struct CrossThreadFlags
 	ULONG SamplingCoverage : 1;                                       
 	ULONG ReservedCrossThreadFlags : 8;                               
 };
-
-
-      
+ 

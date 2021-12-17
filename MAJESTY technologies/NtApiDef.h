@@ -74,7 +74,7 @@ typedef void ( NTAPI * t_ExFreePoolWithTag)(
 
 typedef PVOID (NTAPI* t_ExAllocatePool)(
     POOL_TYPE PoolType,
-    SIZE_T                                         NumberOfBytes
+    SIZE_T  NumberOfBytes
 );
 
 
