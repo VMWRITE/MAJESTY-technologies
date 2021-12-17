@@ -3,6 +3,8 @@ Little driver for protecthion.
 The driver is still under development, so you can submit your ideas!  
 I write it's for manual map driver,because i havn't sertivicate for driver.  
 
+Version 1.1
+
 Check instrumentation callbacks(under VMware) ->  
 ![alt text](https://github.com/LazyAhora/MAJESTY-technologies/blob/main/Detect%20instrumentation%20callbacks.png)  
 Set protect process ->  
