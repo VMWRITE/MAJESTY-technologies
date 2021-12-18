@@ -8,7 +8,16 @@
 
 namespace DetectHyp
 {
-	
+	__forceinline	bool ProcIsIntel()
+	{
+		int cpuid[4]{ -1 }; 
+		__cpuid(cpuid, 0);
+		if (cpuid[2] == 'letn')		 
+		{ 
+			return true;
+		}
+		return false;
+	}
 
 	__forceinline	bool compare_list_cpuid()
 	{
@@ -99,20 +108,28 @@ namespace DetectHyp
 
 	__forceinline bool lbr_is_virtulazed()
 	{
-		auto current_value = __readmsr(MSR_DEBUGCTL);//safe current value
-		__writemsr(MSR_DEBUGCTL, DEBUGCTL_LBR | DEBUGCTL_BTF);
-		auto whatch_write = __readmsr(MSR_DEBUGCTL);
-		__writemsr(MSR_DEBUGCTL, current_value);
-		return (!(whatch_write & DEBUGCTL_LBR));
+		if(ProcIsIntel())
+		{
+			auto current_value = __readmsr(MSR_DEBUGCTL);//safe current value
+			__writemsr(MSR_DEBUGCTL, DEBUGCTL_LBR | DEBUGCTL_BTF);
+			auto whatch_write = __readmsr(MSR_DEBUGCTL);
+			__writemsr(MSR_DEBUGCTL, current_value);
+			return (!(whatch_write & DEBUGCTL_LBR));
+		}
+		return false;
 	}
 
 	__forceinline bool lbr_stask_is_virtulazed()
 	{
-		int cpuid[4]{ -1 };
-		auto currentLBR = __readmsr(MSR_P6M_LBSTK_TOS);
-		__cpuid(cpuid, 0);//call vm-exit
-		auto exitLBR = __readmsr(MSR_P6M_LBSTK_TOS);
-		return currentLBR != exitLBR;
+		if(ProcIsIntel())
+		{
+			int cpuid[4]{ -1 };
+			auto currentLBR = __readmsr(MSR_P6M_LBSTK_TOS);
+			__cpuid(cpuid, 0);//call vm-exit
+			auto exitLBR = __readmsr(MSR_P6M_LBSTK_TOS);
+			return currentLBR != exitLBR;
+		}
+		return false;
 
 	}
 
