@@ -73,16 +73,22 @@ namespace DetectHyp
 
 
 		int cpuid[4]{ -1 };
-		DWORD64  avg{ 0 };
-		for (size_t i = 0; i < 2500; i++)
+		uint64_t  avg{ 0 };
+		for (int i = 0; i < 2500; i++)
 		{
 			auto tick1 = __readmsr(IA32_MPERF_MSR);
 			__cpuid(cpuid, 0);//call vm-exit
 			auto tick2 = __readmsr(IA32_MPERF_MSR);
+
+			if (!tick1 && !tick2)
+			{ 
+				return true;
+			}
+
 			avg += (tick2 - tick1);
 		}
 		avg /= 2500;
-		return  (0xff < avg) || (0xc > avg);
+		return  (0x2ff < avg) || (0xc > avg);
 	}
 
 
@@ -98,7 +104,10 @@ namespace DetectHyp
 			auto  tick1 = __readmsr(IA32_APERF_MSR) << 32;
 			__cpuid(data, 0); //call vm-exit
 			auto tick2 = __readmsr(IA32_APERF_MSR) << 32;
-
+			if (!tick1 && !tick2)
+			{ 
+				return true;
+			}
 			avg += (tick2 - tick1);
 
 		}
