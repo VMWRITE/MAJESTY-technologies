@@ -51,6 +51,10 @@ typedef NTSTATUS(NTAPI* t_KdChangeOption)
     PULONG    OutBufferNeeded
     );
 
+typedef PEPROCESS (NTAPI * t_IoThreadToProcess)
+(
+    PETHREAD Thread
+);
 
 typedef ULONG(NTAPI* t_vDbgPrintExWithPrefix)(
     PCCH    Prefix,
