@@ -61,7 +61,7 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 		 
 
 
-		AntiDebug::AntiUserModeAntiDebug::SetManualHideThread(procId);
+		Log("Is hide thread ->\t %x\n",AntiDebug::AntiUserModeAntiDebug::HideManualThread(procId));
 
 		
 		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(procId));
