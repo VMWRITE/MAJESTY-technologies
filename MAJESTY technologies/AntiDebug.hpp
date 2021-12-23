@@ -65,66 +65,50 @@ namespace AntiDebug
 
 		}
 		   
-		__forceinline bool SetManualHideThread(HANDLE procId )
-		{
-			ULONG Bytes;
-			 
+		
+		__forceinline bool  HideManualThread(HANDLE procId)
+		{  
 
-			auto ZwQuerySystemInformation = (t_ZwQuerySystemInformation)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ZwQuerySystemInformation"));
-
-			ZwQuerySystemInformation(SystemProcessInformation, NULL, NULL, &Bytes); 
+			PETHREAD Thread;
 
 
-			auto ExAllocatePool = (t_ExAllocatePool)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ExAllocatePool"));
-
-			PSYSTEM_PROCESS_INFO ProcInfo = (PSYSTEM_PROCESS_INFO)ExAllocatePool(NonPagedPool, Bytes);
-
-			if (ProcInfo == NULL)
-				return false;
-
-			ApiWrapper::ZeroMemory(ProcInfo, Bytes);
+			bool IsHide = true;
+		
+			auto PsLookupThreadByThreadId = (t_PsLookupThreadByThreadId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupThreadByThreadId"));
 
 
-			auto ExFreePoolWithTag = (t_ExFreePoolWithTag)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("ExFreePoolWithTag"));
-
-			if (!NT_SUCCESS(ZwQuerySystemInformation(SystemProcessInformation, ProcInfo, Bytes, &Bytes)))
+			auto    IoThreadToProcess = (t_IoThreadToProcess)(Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("IoThreadToProcess")));
+			for (size_t i = 0; i < 35000 ; i++)
 			{
-				ExFreePoolWithTag(ProcInfo,0 );
-				return false;
-			}
 
-			for (PSYSTEM_PROCESS_INFO Entry = ProcInfo; Entry->NextEntryOffset != NULL; Entry = (PSYSTEM_PROCESS_INFO)((UCHAR*)Entry + Entry->NextEntryOffset))
-			{ 
-				if (PIDHelp::GetEProcessByProcIdEx(Entry->ProcessId) == PIDHelp::GetEProcessByProcIdEx(procId))
+
+				if (NT_SUCCESS(PsLookupThreadByThreadId((HANDLE)i, &Thread)))
 				{
-					for (size_t i = 0; i < Entry->NumberOfThreads; i++)
+
+					auto proc = IoThreadToProcess(Thread);
+
+					if (proc)
 					{
+						auto procIdProcess = *(uint32_t*)((uint64_t)proc + PIDHelp::OffsetHelp::OffsetUniqueProcessId);
 
-
-						PETHREAD Thread;
-
-
-						auto PsLookupThreadByThreadId = (t_PsLookupThreadByThreadId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupThreadByThreadId"));
-						
-
-						if (NT_SUCCESS(PsLookupThreadByThreadId(Entry->Threads[i].ClientId.UniqueThread, (PETHREAD*)&Thread)))
+						if (procId == (HANDLE)procIdProcess)
 						{
-							 
-							if ((*(ULONG*)((ULONG64)Thread + Offset::debugOffset.HideFromDebugger) & 0x4) == 0)
+							if ((*(uint32_t*)((uint64_t)Thread + Offset::debugOffset.HideFromDebugger) & 0x4) == 0)
 							{
-								 *(ULONG*)((ULONG64)Thread + Offset::debugOffset.HideFromDebugger) ^= 4;
-							
+								*(uint32_t*)((uint64_t)Thread + Offset::debugOffset.HideFromDebugger) ^= 4;
+								return true;
+
+
 							}
 						}
 					}
 
-					ExFreePoolWithTag(ProcInfo,0);
-					return true;
 				}
-			}
 
-			ExFreePoolWithTag(ProcInfo,0);
+			}
+			
 			return false;
+
 		}
 		 
 
