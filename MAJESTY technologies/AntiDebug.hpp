@@ -72,8 +72,7 @@ namespace AntiDebug
 
 			PETHREAD Thread;
 
-
-			bool IsHide = true;
+ 
 		
 			auto PsLookupThreadByThreadId = (t_PsLookupThreadByThreadId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupThreadByThreadId"));
 
