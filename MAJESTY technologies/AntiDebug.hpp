@@ -66,6 +66,7 @@ namespace AntiDebug
 		}
 		   
 		
+		//Brute force find thread and check procId by thread
 		__forceinline bool  HideManualThread(HANDLE procId)
 		{  
 
