@@ -1,7 +1,6 @@
 #pragma once
 #include "NoCRT.h"
 #define mmix(h,k) { k *= m; k ^= k >> r; k *= m; h *= m; h ^= k; }
-#define MurmurHashStr(str) MurmurHash2A(str,NoCRT::string::strlen(str),  NoCRT::string::strlen(str) )
 
 
 __forceinline constexpr uint64_t  MurmurHash2A(uint64_t key, int len, uint64_t  seed)
