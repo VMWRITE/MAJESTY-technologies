@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Util.hpp"
-
+#include "MurmurHash2A.h"
 //	https://secret.club/2020/04/13/how-anti-cheats-detect-system-emulation.html
 
 
@@ -9,21 +9,19 @@
 namespace DetectHyp
 {
 	__forceinline	bool ProcIsIntel()
-	{
-		int cpuid[4]{ -1 }; 
-		__cpuid(cpuid, 0);
-		if (cpuid[2] == 'letn')		 
-		{ 
-			return true;
-		}
+		{
+			int cpuid[4]{ -1 }; 
+			__cpuid(cpuid, 0);
+				if (MurmurHash2A(cpuid[2],4,4) == MurmurHash2A('letn',4,4))
+				{	return true;		}
 		return false;
-	}
+	}	
 
 	__forceinline	bool compare_list_cpuid()
 	{
 		//compare cpuid  list
 		int  invalid_cpuid_list[4] = { -1 };
-		int valid_cpuid_list[4] = { -1 };
+		int valid_cpuid_list[4] = { -1 }; 
 
 		__cpuid(invalid_cpuid_list, 0x13371337);
 		__cpuid(valid_cpuid_list, 0x40000000);
@@ -74,23 +72,23 @@ namespace DetectHyp
 
 		int cpuid[4]{ -1 };
 		uint64_t  avg{ 0 };
-		for (int i = 0; i < 2500; i++)
+		for (int i = 0; i < 30; i++)
 		{
 			auto tick1 = __readmsr(IA32_MPERF_MSR);
 			__cpuid(cpuid, 0);//call vm-exit
 			auto tick2 = __readmsr(IA32_MPERF_MSR);
 
 			if (!tick1 && !tick2)
-			{ 
+			{
 				return true;
 			}
 
 			avg += (tick2 - tick1);
 		}
-		avg /= 2500;
-		return  (0x2ff < avg) || (0xc > avg);
-	}
+		avg /= 30;
+		return  (0x2ff < avg) || (0xc > avg );
 
+	}
 
 	// Some hypervisor just return 0(like:VMware)
 	bool time_attack_APERF()
@@ -99,7 +97,7 @@ namespace DetectHyp
 		uint64_t avg{ 0 };
 		int data[4]{ -1 };
 
-		for (size_t i = 0; i < 2500; i++)
+		for (size_t i = 0; i < 30; i++)
 		{
 			auto  tick1 = __readmsr(IA32_APERF_MSR) << 32;
 			__cpuid(data, 0); //call vm-exit
@@ -109,9 +107,8 @@ namespace DetectHyp
 				return true;
 			}
 			avg += (tick2 - tick1);
-
 		}
-		avg /= 2500;
+		avg /= 30;
 		return   (avg < 0x00000BE30000) || (avg > 0x00000FFF0000000);
 	}
 

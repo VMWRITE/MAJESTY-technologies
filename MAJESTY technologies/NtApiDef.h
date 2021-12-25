@@ -39,6 +39,20 @@ typedef NTSTATUS(NTAPI* t_ZwSystemDebugControl)
     unsigned long* pResultLength
     );
 
+
+typedef NTSTATUS (NTAPI * t_PspGetContextThreadInternal)
+( 
+    PETHREAD thread,
+    PCONTEXT context , 
+    MODE,
+    MODE, 
+    MODE
+);
+
+ 
+
+
+
 typedef NTSTATUS(NTAPI* t_KdDisableDebugger)();
 
 typedef NTSTATUS(NTAPI* t_KdChangeOption)
@@ -51,10 +65,6 @@ typedef NTSTATUS(NTAPI* t_KdChangeOption)
     PULONG    OutBufferNeeded
     );
 
-typedef PEPROCESS (NTAPI * t_IoThreadToProcess)
-(
-    PETHREAD Thread
-);
 
 typedef ULONG(NTAPI* t_vDbgPrintExWithPrefix)(
     PCCH    Prefix,

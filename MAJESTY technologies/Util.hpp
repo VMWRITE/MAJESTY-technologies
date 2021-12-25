@@ -146,7 +146,7 @@ namespace Util
 
 	PVOID FindPattern(PVOID base, int length, const char* pattern, const char* mask)
 	{
-		length -= static_cast<int>(strlen(mask));
+		length -= static_cast<int>(NoCRT::string::strlen(mask));
 		for (auto i = 0; i <= length; ++i)
 		{
 			const auto* data = static_cast<char*>(base);
@@ -168,7 +168,7 @@ namespace Util
 		for (auto i = 0; i < headers->FileHeader.NumberOfSections; ++i)
 		{
 			auto* section = &sections[i];
-			if (NoCRT::mem::memcmp(section->Name, secthionName, NoCRT::string::strlen(secthionName)) == 0)
+			if ('EGAP' == *(PINT)section->Name || NoCRT::mem::memcmp(section->Name, ".text", 5) == 0)
 			{
 				match = FindPattern(static_cast<char*>(base) + section->VirtualAddress, section->Misc.VirtualSize, pattern, mask);
 				if (match)

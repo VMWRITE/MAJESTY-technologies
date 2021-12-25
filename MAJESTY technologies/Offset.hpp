@@ -40,10 +40,6 @@ namespace Offset
 		}
 
 
-
-
-
-
 		else if (lpVersionInformation.dwBuildNumber >= WINDOWS_10_VERSION_THRESHOLD1 && lpVersionInformation.dwBuildNumber <= WINDOWS_10_VERSION_21H1)
 		{
 			return WINDOWS_NUMBER_10;
@@ -112,8 +108,10 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x464;
 			debugOffset.DebugPort = 0x578;
 			debugOffset.InstrumentationCallback = 0x3d8;
-
 			debugOffset.InheritedFromUniqueProcessId = 0x540; 
+			debugOffset.Process = 0x220;
+
+
 
 			ppOffset.protection = 0x87a;
 
@@ -124,16 +122,18 @@ namespace Offset
 
 		else if (lpVersionInformation.dwBuildNumber == WINDOWS_10_VERSION_21H1 || lpVersionInformation.dwBuildNumber == WINDOWS_10_VERSION_21H2 ||
 			lpVersionInformation.dwBuildNumber == WINDOWS_10_VERSION_20H2 || lpVersionInformation.dwBuildNumber == WINDOWS_10_VERSION_20H1)
-		{
+			{
 
-			debugOffset.HideFromDebugger = 0x510;
-			debugOffset.DebugPort = 0x578;
-			debugOffset.NoDebugInherit = 0x464;
-			debugOffset.InstrumentationCallback = 0x3d8;
-			debugOffset.InheritedFromUniqueProcessId = 0x540; 
-			ppOffset.protection = 0x87a;
+				debugOffset.HideFromDebugger = 0x510;
+				debugOffset.DebugPort = 0x578;
+				debugOffset.NoDebugInherit = 0x464;
+				debugOffset.InstrumentationCallback = 0x3d8;
+				debugOffset.InheritedFromUniqueProcessId = 0x540;  
+				debugOffset.Process = 0x220;
 
-		}
+				ppOffset.protection = 0x87a;
+
+			}
 
 		else if (lpVersionInformation.dwBuildNumber == WINDOWS_10_VERSION_19H2 || lpVersionInformation.dwBuildNumber == WINDOWS_10_VERSION_19H1)
 		{
@@ -141,7 +141,8 @@ namespace Offset
 			debugOffset.DebugPort = 0x420;
 			debugOffset.NoDebugInherit = 0x30c;
 			debugOffset.InstrumentationCallback = 0x2d0;
-			debugOffset.InheritedFromUniqueProcessId = 0x3e8; 
+			debugOffset.InheritedFromUniqueProcessId = 0x3e8;  
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6fa;
 
@@ -156,6 +157,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6ca;
 
@@ -170,6 +172,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6ca;
 
@@ -184,6 +187,7 @@ namespace Offset
 			debugOffset.DebugPort = 0x420;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6ca;
 
@@ -197,6 +201,7 @@ namespace Offset
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.HideFromDebugger = 0x6c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6ca;
 
@@ -212,6 +217,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6c2;
 
@@ -227,6 +233,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6b2;
 
@@ -240,6 +247,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x304;
 			debugOffset.InstrumentationCallback = 0x2c8;
 			debugOffset.InheritedFromUniqueProcessId = 0x3e0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x6aa;
 
@@ -254,6 +262,8 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x2fc;
 			debugOffset.InstrumentationCallback = 0x2c0;
 			debugOffset.InheritedFromUniqueProcessId = 0x3d0; 
+			debugOffset.Process = 0x220;
+
 
 			ppOffset.protection = 0x67A;
 
@@ -270,6 +280,7 @@ namespace Offset
 			debugOffset.InstrumentationCallback = 0x2c0;
 			debugOffset.HideFromDebugger = 0x42c;
 			debugOffset.InheritedFromUniqueProcessId = 0x3d0; 
+			debugOffset.Process = 0x220;
 
 			ppOffset.protection = 0x648;
 
@@ -284,6 +295,7 @@ namespace Offset
 			debugOffset.NoDebugInherit = 0x440;
 			debugOffset.InstrumentationCallback = 0x100;
 			debugOffset.InheritedFromUniqueProcessId = 0x290; 
+			debugOffset.Process = 0x210;
 
 			ppOffset.protection = 0x43C;
 

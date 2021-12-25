@@ -54,12 +54,6 @@
     <ClInclude Include="NtApiDef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Struct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AntiDebug.hpp">
-      <Filter>AntiReverse</Filter>
-    </ClInclude>
     <ClInclude Include="AntiHypervisor.hpp">
       <Filter>AntiReverse</Filter>
     </ClInclude>
@@ -69,8 +63,17 @@
     <ClInclude Include="PplibEx.hpp">
       <Filter>AntiReverse</Filter>
     </ClInclude>
-    <ClInclude Include="xor.h">
+    <ClInclude Include="xorstr.h">
       <Filter>Obfuscathion</Filter>
+    </ClInclude>
+    <ClInclude Include="MurmurHash2A.h">
+      <Filter>Obfuscathion</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiDebug.hpp">
+      <Filter>AntiReverse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -16,8 +16,7 @@
 
 //set ERW for present problem
 #pragma comment(linker, "/SECTION:.text,EWR")
-
-
+ 
 
 
 /*
@@ -37,44 +36,43 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 
 
 
-	
+
 
 	gl_baseNtoskrnl = baseNtoskrnl;	//just set global value,because i lazy 
 
 
+	PIDHelp::OffsetHelp::InitOffset(); // init value for get pid and other staff
 
-	static HANDLE procId = PIDHelp::GetID("SexyTest.exe"); 
+	 
 
-	
-	
-		 
-	 if (Offset::GetOffset())
+	static HANDLE procId = PIDHelp::GetID(xorstr_("SexyTest.exe"));
+
+
+
+	if (Offset::GetOffset() )
 	{
-		
+
 		
 		Log("Is debug port ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::PsIsProcessBeingDebugged(procId));
 
 		Log("Is debug flag ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsProcessDebugFlag(procId));
-		  
+
 		Log("Is under Explorer ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsUnderExplorer(procId));
-
 		 
-
-
-		Log("Is hide thread ->\t %x\n",AntiDebug::AntiUserModeAntiDebug::HideManualThread(procId));
-
-		
+		Log("Is find  thread and set HideFromDebugger ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::HideManualThread(procId));
+		 
 		Log("Is instumenthion callbakc ->\t %x\n", AntiDebug::AntiUserModeAntiDebug::IsInstrCallbacks(procId));
 
 		PplibEx::ProtectProcessByPID(procId);
 
+		
 	}
 
 	else
 	{
 		Log("Can't find offset!\n");
 	}
-	 
+	
 	Log("KdChangeOpthion ->\t %x\n", AntiDebug::AntiKernelDebug::IsChangeOpthion());
 	Log("Disable kernel debugger ->\t %x\n", AntiDebug::AntiKernelDebug::DisableKernelDebug());
 	Log("ZwSystemDebugControl ->\t %x\n", AntiDebug::AntiKernelDebug::DebugTrigger());
@@ -85,15 +83,15 @@ NTSTATUS DriverEntry(/* IN PDRIVER_OBJECT pDriverObject*/ DWORD64 baseNtoskrnl, 
 	Log("Check virtualizathion lbr ->\t %x\n", DetectHyp::lbr_is_virtulazed());
 	Log("Check stack lbr ->\t %x\n", DetectHyp::lbr_stask_is_virtulazed());
 
-	
+
 	Log("Time attack rdtsc ->\t %x\n", DetectHyp::time_attack_rdtsc());
 	Log("Time attack with APERF ->\t %x\n", DetectHyp::time_attack_APERF());
 	Log("Time attack with MPERF ->\t %x\n", DetectHyp::time_attack_MPERF());
 	
-
+	
 	return STATUS_SUCCESS;
 
 
 
-
+	
 }

@@ -160,7 +160,7 @@ namespace NoCRT {
 			return c;
 		}
 
-		__forceinline  int strlen(const char* string)
+		__forceinline   int strlen(const char* string)
 		{
 			int cnt = 0;
 			if (string)
@@ -328,7 +328,7 @@ namespace NoCRT {
 		}
 
 		__forceinline  bool iswdigit(wchar_t c) { return c >= L'0' && c <= L'9'; }
-		__forceinline  __int64 wtoi64(const wchar_t* nptr)
+		constexpr 	__forceinline  __int64 wtoi64(const wchar_t* nptr)
 		{
 			wchar_t* s = (wchar_t*)nptr;
 			__int64 acc = 0;

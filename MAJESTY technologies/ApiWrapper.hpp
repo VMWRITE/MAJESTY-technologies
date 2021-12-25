@@ -7,10 +7,10 @@
 
 namespace ApiWrapper
 {
-    __forceinline    UNICODE_STRING InitUnicodeString(static const wchar_t* string_to_init)
+    __forceinline constexpr   UNICODE_STRING InitUnicodeString(static const wchar_t* string_to_init)
     {
 
-        UNICODE_STRING stringInit;
+        UNICODE_STRING stringInit{ 0 };
         if (string_to_init)
         {
             stringInit.Length = NoCRT::string::wstrlen(string_to_init) * sizeof(wchar_t);

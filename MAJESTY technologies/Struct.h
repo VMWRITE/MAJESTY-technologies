@@ -8,7 +8,7 @@
 #include <ntimage.h>
 #include <cstdint>
  
-#include "xor.h"
+#include "xorstr.h"
 #define WINDOWS_7 7600
 #define WINDOWS_7_SP1 7601
 #define WINDOWS_8 9200
@@ -784,11 +784,13 @@ typedef enum _PS_PROTECTED_TYPE
 
 struct DebugOffset
 {
-	DWORD NoDebugInherit;
-	DWORD DebugPort;
-	DWORD HideFromDebugger;
-	DWORD InstrumentationCallback;
-	DWORD InheritedFromUniqueProcessId;  
+	uint32_t NoDebugInherit;
+	uint32_t DebugPort;
+	uint32_t HideFromDebugger;
+	uint32_t InstrumentationCallback;
+	uint32_t InheritedFromUniqueProcessId;
+	uint32_t Process;
+
 };
 
 
