@@ -3,31 +3,15 @@
 
 
 
+ 
 
-
-typedef BOOLEAN(NTAPI* t_PsIsProcessBeingDebugged)
+typedef NTSTATUS (NTAPI* t_PsGetContextThread)
 (
-    PEPROCESS Process
-
-    );
-
-
-
-typedef NTSTATUS (NTAPI* t_ZwQuerySystemInformation)
-(
-     SYSTEM_INFORMATION_CLASS SystemInformationClass,
-     PVOID                    SystemInformation,
-     ULONG                    SystemInformationLength,
-     PULONG                   ReturnLength
+     PETHREAD Thread,
+     PCONTEXT ThreadContext,
+     KPROCESSOR_MODE Mode
 );
 
-typedef NTSTATUS (NTAPI * t_ZwQueryInformationThread)(
-   HANDLE          ThreadHandle,
-   THREADINFOCLASS ThreadInformationClass,
-   PVOID           ThreadInformation,
-   ULONG           ThreadInformationLength,
-   PULONG          ReturnLength
-);
 
 typedef NTSTATUS(NTAPI* t_ZwSystemDebugControl)
 (
@@ -39,16 +23,7 @@ typedef NTSTATUS(NTAPI* t_ZwSystemDebugControl)
     unsigned long* pResultLength
     );
 
-
-typedef NTSTATUS (NTAPI * t_PspGetContextThreadInternal)
-( 
-    PETHREAD thread,
-    PCONTEXT context , 
-    MODE,
-    MODE, 
-    MODE
-);
-
+ 
  
 
 
@@ -80,17 +55,7 @@ typedef  NTSTATUS(NTAPI* t_RtlGetVersion)
     );
 
 
-typedef void ( NTAPI * t_ExFreePoolWithTag)(
-    PVOID P,
-    ULONG Tag
-);
-
-
-typedef PVOID (NTAPI* t_ExAllocatePool)(
-    POOL_TYPE PoolType,
-    SIZE_T  NumberOfBytes
-);
-
+ 
 
 typedef  NTSTATUS(NTAPI* t_PsLookupThreadByThreadId)
 (
@@ -99,12 +64,7 @@ typedef  NTSTATUS(NTAPI* t_PsLookupThreadByThreadId)
     );
 
 
-
-typedef NTSTATUS(NTAPI* t_PsLookupProcessByProcessId)(
-    HANDLE    ProcessId,
-    PEPROCESS* Process
-    );
-
+ 
 typedef LONG_PTR(NTAPI* t_ObfReferenceObject)
 (
     PVOID Object
@@ -120,10 +80,7 @@ typedef NTSTATUS(NTAPI* t_ObOpenObjectByPointer)(
     KPROCESSOR_MODE AccessMode,
     PHANDLE         Handle
     );
-
-typedef NTSTATUS(NTAPI* t_NtClose)(
-    HANDLE Handle
-    );
+ 
 EXTERN_C NTSTATUS NTAPI ExRaiseHardError
 (
     NTSTATUS ErrorStatus,

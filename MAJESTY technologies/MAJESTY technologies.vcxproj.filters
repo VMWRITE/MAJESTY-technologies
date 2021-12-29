@@ -23,14 +23,14 @@
     <Filter Include="Obfuscathion">
       <UniqueIdentifier>{cb6075d4-17df-4280-8fb7-103222b1c9e1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Util">
-      <UniqueIdentifier>{8dcc469a-1985-430a-9075-1f7ea06a9b37}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AntiReverse">
       <UniqueIdentifier>{78b18822-0940-453a-97a3-e3733b35acfd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Asm">
       <UniqueIdentifier>{8e8481b3-a740-4a86-ad82-63ebaaa99a9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{8dcc469a-1985-430a-9075-1f7ea06a9b37}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

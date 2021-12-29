@@ -7,7 +7,7 @@
 
 namespace ApiWrapper
 {
-    __forceinline constexpr   UNICODE_STRING InitUnicodeString(static const wchar_t* string_to_init)
+    __forceinline    UNICODE_STRING InitUnicodeString(static const wchar_t* string_to_init)
     {
 
         UNICODE_STRING stringInit{ 0 };

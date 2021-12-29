@@ -65,6 +65,7 @@ namespace AntiDebug
 		}
 
 
+		 
 		  
 		//Brute force find thread and check procId by thread
 		__forceinline bool  HideManualThread(HANDLE procId)
@@ -73,7 +74,6 @@ namespace AntiDebug
 			bool IsSetHide = false;
 
 			PETHREAD Thread;
-
 
 
 			auto PsLookupThreadByThreadId = (t_PsLookupThreadByThreadId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupThreadByThreadId"));
@@ -112,6 +112,55 @@ namespace AntiDebug
 
 		}
 
+		//Brute force find thread and check procId by thread
+		__forceinline bool  IsHardwareBreakpoint(HANDLE procId)
+		{
+
+			bool IsHardwareBreakpoint  = false;
+
+			PETHREAD Thread;
+
+			auto PsLookupThreadByThreadId = (t_PsLookupThreadByThreadId)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsLookupThreadByThreadId"));
+
+			auto PsGetContextThread = (t_PsGetContextThread)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("PsGetContextThread"));
+
+			for (size_t i = 0; i < 35000; i++)
+			{
+
+
+				if (NT_SUCCESS(PsLookupThreadByThreadId((HANDLE)i, &Thread)))
+				{
+
+					auto proc = *(PEPROCESS*)((uint64_t)Thread + Offset::debugOffset.Process);
+
+					if (proc)
+					{
+						auto procIdProcess = *(HANDLE*)((uint64_t)proc + PIDHelp::OffsetHelp::OffsetUniqueProcessId);
+
+						if (procId == procIdProcess)
+						{
+							CONTEXT ctx;
+							ctx.ContextFlags = CONTEXT_ALL; 
+							if (NT_SUCCESS(PsGetContextThread(Thread,&ctx, KernelMode)))
+							{
+								if (ctx.Dr7 && ctx.Dr6)
+								{
+									IsHardwareBreakpoint = true;
+								}
+							
+							} 
+						}
+					}
+
+				}
+
+			}
+
+			return IsHardwareBreakpoint;
+
+		}
+
+		
 
 		__forceinline	bool IsUnderExplorer(HANDLE procId)
 		{
@@ -161,7 +210,95 @@ namespace AntiDebug
 			}
 			return IsInstEnable != 0;
 		}
+		
+		__forceinline bool BreakDebugPortMutex ()
+		{
 
+			/*
+			
+			BF 53 03 00 C0  0F 84  
+
+			 
+			\xBF\x53\x03\x00\xC0\x0F\x84 xxx?xxx
+
+			48 8D 0D
+			*/
+
+			auto ProcessDebugPortMutexSig = (uint64_t)Util::FindPatternImage((PVOID)gl_baseNtoskrnl, xorstr_("PAGE"), xorstr_("\xBF\x53\x03\x00\xC0\x0F\x84"), xorstr_("xxx?xxx"));
+
+			if (!ProcessDebugPortMutexSig)
+			{
+				Log("Can't find pattern \n");
+				return false;
+			}
+			for (size_t i = 0; *(BYTE*)(ProcessDebugPortMutexSig + i) != 0xc3; i++) //wallking while not ret 
+			{
+				if (
+					*(BYTE*)(ProcessDebugPortMutexSig + i) == 0x48 &&
+					*(BYTE*)(ProcessDebugPortMutexSig + i + 1) == 0x8D &&
+					*(BYTE*)(ProcessDebugPortMutexSig + i + 2) == 0x0D
+					)
+				{
+					ProcessDebugPortMutexSig += i;
+					auto ProcessDebugPortMutexFix = (uint64_t)Util::ResolveRelativeAddress((PVOID)ProcessDebugPortMutexSig, 3, 7);
+ 
+					*( bool* )ProcessDebugPortMutexFix = 0;
+					return true;
+				}
+			}
+
+			return false;
+
+
+
+		}
+
+		__forceinline bool DisableValidAccessMask()
+		{
+			/*
+			 Very thank's https://www.codenong.com/cs106696582/
+				
+				40 8A C5 4C 89 ? 24 ?
+
+				\x40\x8A\xC5\xC4\x89\x00\x24\x00 xxxxx?x? 
+
+			48 8B 05
+
+			48 8B 05 A1 1F D9 FF                            mov     rax, cs:DbgkDebugObjectType // 7 
+
+			48 8B 05 C6 9C 47 00                            mov     rax, cs:DbgkDebugObjectType // 10 
+			
+			*/
+			auto DbgObjectPattern = (uint64_t)Util::FindPatternImage((PVOID)gl_baseNtoskrnl, xorstr_("PAGE"), xorstr_("\x40\x8A\xC5\x4C\x89\x00\x24\x00"), xorstr_("xxxxx?x?"));
+		
+			if (!DbgObjectPattern)
+			{
+				Log("Can't find pattern \n");
+				return false;
+			}
+
+			for (size_t i = 0;*(BYTE*)(DbgObjectPattern + i) != 0xc3; i++) //wallking while not ret 
+			{
+				if (
+					*(BYTE*)(DbgObjectPattern + i) ==  0x48 &&
+					*(BYTE*)(DbgObjectPattern + i + 1 ) == 0x8b &&
+					*(BYTE*)(DbgObjectPattern + i + 2) == 0x05
+					)
+				{
+					DbgObjectPattern += i;
+					auto DbgObjectPatternFixValue = (uint64_t)Util::ResolveRelativeAddress((PVOID)DbgObjectPattern, 3, 7);
+
+					auto ObjectTypePointer = *(uint64_t*)(DbgObjectPatternFixValue);
+
+					*(ULONG*)(ObjectTypePointer + 0x40 + 0x1c) = 0; // _OBJECT_TYPE -> TypeInfo - 0x40   ValidAccessMask - 0x1c 
+					return true;
+				}
+			}
+			
+			return false;
+
+			
+		}
 	}
 	namespace AntiKernelDebug
 	{
@@ -194,10 +331,10 @@ namespace AntiDebug
 				0,
 				0,
 				0,
-				0
-			);
+0
+);
 
-			return MurmurHash2A(status,10,10) != MurmurHash2A(STATUS_DEBUGGER_INACTIVE,10,10);
+return MurmurHash2A(status, 10, 10) != MurmurHash2A(STATUS_DEBUGGER_INACTIVE, 10, 10);
 		}
 
 		//Call KdChangeOption like Vanguard  -> https://www.unknowncheats.me/forum/2798056-post2.html
@@ -206,7 +343,7 @@ namespace AntiDebug
 
 			auto KdChangeOption = (t_KdChangeOption)Util::GetProcAddress(gl_baseNtoskrnl, xorstr_("KdChangeOption"));
 			auto status = KdChangeOption(KD_OPTION_SET_BLOCK_ENABLE, NULL, NULL, NULL, NULL, NULL);
-			return MurmurHash2A(status,6,6) != MurmurHash2A(STATUS_DEBUGGER_INACTIVE,6,6);
+			return MurmurHash2A(status, 6, 6) != MurmurHash2A(STATUS_DEBUGGER_INACTIVE, 6, 6);
 
 		}
 
@@ -215,6 +352,7 @@ namespace AntiDebug
 		//Check Some value ( more info -> https://shhoya.github.io/antikernel_kerneldebugging4.html	)
 		__forceinline	bool CheckGlobalValue()
 		{
+			
 
 			auto kernelDebuggerPres = *(BYTE*)(0xFFFFF78000000000 + 0x02D4);
 
@@ -223,7 +361,9 @@ namespace AntiDebug
 			if (KdEnteredDebugger)
 			{
 				if (*KdEnteredDebugger)
+				{
 					return true;
+				}
 			}
 
 			//	check value in KUSER_SHARED_DATA 
@@ -231,7 +371,73 @@ namespace AntiDebug
 			{
 				return true;
 			}
+			auto  patternKdpBootedNodebug = (uint64_t)Util::FindPatternImage((PVOID)gl_baseNtoskrnl, xorstr_("PAGE"), xorstr_("\x4C\x8B\xD2\x83\x64\x24\x00\x00\x48\x83"), xorstr_("xxxxxx??xx"));
 
+			if (patternKdpBootedNodebug)
+			{
+
+				/*
+				4C 8B D2 83 64 24  ? ? 48 83
+
+				\x4C\x8B\xD2\x83\x64\x24\x00\x00\x48\x83  xxxxxx??xx
+
+				80 3D ? ? ? ?  00 // KdpBootedNodebug
+				*/
+				for (size_t i = 0; *(BYTE*)(patternKdpBootedNodebug + i) != 0xc3; i++) //wallking while not 1  ret 
+				{
+					if (
+						*(BYTE*)(patternKdpBootedNodebug + i) == 0x80 &&
+						*(BYTE*)(patternKdpBootedNodebug + i + 1) == 0x3D
+						)
+					{
+						patternKdpBootedNodebug += i;
+						auto KdpBootedNodebugFix = (uint64_t)Util::ResolveRelativeAddress((PVOID)patternKdpBootedNodebug, 2, 7);
+
+
+						if (!*(bool*)KdpBootedNodebugFix)
+						{
+							return true;
+						}
+
+						break;
+
+					}
+				}
+
+
+			}
+
+			/*
+			48 89 ? ? ?      45 33 C9    45 8B C2
+			\x48\x89\x00\x00\x00\x45\x33\xC9\x45\x8B\xC2  xx???xxxxxx
+			*/
+			auto KdpReadVirtualMemoryPattern = (uint64_t)Util::FindPatternImage((PVOID)gl_baseNtoskrnl, xorstr_("PAGEKD"), xorstr_("\x48\x89\x00\x00\x00\x45\x33\xC9\x45\x8B\xC2"), xorstr_("xx???xxxxxx"));
+			if (KdpReadVirtualMemoryPattern)
+			{
+				for (size_t i = 0; *(BYTE*)(KdpReadVirtualMemoryPattern + i) != 0xc3; i++) //wallking while not 1  ret 
+				{
+
+					if (
+						*(BYTE*)(KdpReadVirtualMemoryPattern + i) == 0x4c &&
+						*(BYTE*)(KdpReadVirtualMemoryPattern + i + 1) == 0x8D &&
+						*(BYTE*)(KdpReadVirtualMemoryPattern + i + 2) == 0X0D
+						)
+					{
+						KdpReadVirtualMemoryPattern += i;
+						auto KdpContextFix = (uint64_t)Util::ResolveRelativeAddress((PVOID)KdpReadVirtualMemoryPattern, 3, 7);
+
+
+						if (*(uint64_t*)KdpContextFix)
+						{
+							return true;
+						}
+
+						break;
+
+					}
+				}
+			}
+			
 			return false;
 		}
 

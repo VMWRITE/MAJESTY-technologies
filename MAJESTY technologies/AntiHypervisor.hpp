@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Util.hpp"
-#include "MurmurHash2A.h"
+#include "MurmurHash2A.h" 
 //	https://secret.club/2020/04/13/how-anti-cheats-detect-system-emulation.html
+
 
 
 
@@ -50,14 +51,14 @@ namespace DetectHyp
 	bool   time_attack_rdtsc()
 	{ 
 		uint64_t avg = 0;
-		int cpuInfo[4] = {};
+		int cpuInfo[4] = {}; 
 		for (int i = 0; i < 2500; i++)
 		{
 			auto tick1 = __readmsr(IA32_TIME_STAMP_COUNTER);
 			__cpuid(cpuInfo, 0);// vm-exit
 			auto tick2 = __readmsr(IA32_TIME_STAMP_COUNTER);
 			avg += (tick2 - tick1);
-		}
+		} 
 		avg /= 2500;
 		return (avg < 500 && avg > 25) ? false : true;
 	}
@@ -71,7 +72,7 @@ namespace DetectHyp
 
 
 		int cpuid[4]{ -1 };
-		uint64_t  avg{ 0 };
+		uint64_t  avg{ 0 }; 
 		for (int i = 0; i < 30; i++)
 		{
 			auto tick1 = __readmsr(IA32_MPERF_MSR);
@@ -84,7 +85,7 @@ namespace DetectHyp
 			}
 
 			avg += (tick2 - tick1);
-		}
+		} 
 		avg /= 30;
 		return  (0x2ff < avg) || (0xc > avg );
 
@@ -95,8 +96,7 @@ namespace DetectHyp
 	{
 
 		uint64_t avg{ 0 };
-		int data[4]{ -1 };
-
+		int data[4]{ -1 }; 
 		for (size_t i = 0; i < 30; i++)
 		{
 			auto  tick1 = __readmsr(IA32_APERF_MSR) << 32;
@@ -105,7 +105,7 @@ namespace DetectHyp
 			if (!tick1 && !tick2)
 			{ 
 				return true;
-			}
+			} 
 			avg += (tick2 - tick1);
 		}
 		avg /= 30;

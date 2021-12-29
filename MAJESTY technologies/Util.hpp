@@ -1,7 +1,7 @@
 #pragma once
 #include "NtApiDef.h"
 #include "ApiWrapper.hpp"
-
+#include "MurmurHash2A.h"
 
 #define Log(x,...)  Util::Print(xorstr_(x), __VA_ARGS__)
 
@@ -35,13 +35,13 @@ namespace Util
 		return response;
 	}
 
-
-	__forceinline  DWORD64	GetProcAddress(const uintptr_t imageBase, const char* exportName) {
+	
+	__forceinline  uint64_t	GetProcAddress(const uintptr_t imageBase, const char* exportName) {
 
 		if (!imageBase)
 			return 0;
 
-		if (reinterpret_cast<PIMAGE_DOS_HEADER>(imageBase)->e_magic != 0x5A4D)
+		if ( MurmurHash2A( reinterpret_cast<PIMAGE_DOS_HEADER>(imageBase)->e_magic,10,10) != MurmurHash2A(0x5A4D,10,10))
 			return 0;
 
 		const auto ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS64>(imageBase + reinterpret_cast<PIMAGE_DOS_HEADER>(imageBase)->e_lfanew);
@@ -130,7 +130,7 @@ namespace Util
 	}
 	 
 
-	bool  CheckMask(const char* base, const char* pattern, const char* mask)
+	__forceinline bool  CheckMask(const char* base, const char* pattern, const char* mask)
 	{
 		for (; *mask; ++base, ++pattern, ++mask)
 		{
@@ -144,7 +144,7 @@ namespace Util
 	}
 
 
-	PVOID FindPattern(PVOID base, int length, const char* pattern, const char* mask)
+	__forceinline PVOID FindPattern(PVOID base, int length, const char* pattern, const char* mask)
 	{
 		length -= static_cast<int>(NoCRT::string::strlen(mask));
 		for (auto i = 0; i <= length; ++i)
@@ -158,7 +158,7 @@ namespace Util
 		return nullptr;
 	}
 
-	PVOID FindPatternImage(PVOID base, const char* secthionName, const char* pattern, const char* mask)
+	__forceinline PVOID FindPatternImage(PVOID base, const char* secthionName, const char* pattern, const char* mask)
 	{
 		PVOID match = nullptr;
 
@@ -168,7 +168,7 @@ namespace Util
 		for (auto i = 0; i < headers->FileHeader.NumberOfSections; ++i)
 		{
 			auto* section = &sections[i];
-			if ('EGAP' == *(PINT)section->Name || NoCRT::mem::memcmp(section->Name, ".text", 5) == 0)
+			if ( NoCRT::mem::memcmp(section->Name, secthionName, NoCRT::string::strlen(secthionName)) == 0)
 			{
 				match = FindPattern(static_cast<char*>(base) + section->VirtualAddress, section->Misc.VirtualSize, pattern, mask);
 				if (match)
@@ -177,5 +177,12 @@ namespace Util
 		}
 
 		return match;
+	}
+
+	__forceinline PVOID ResolveRelativeAddress(PVOID pvAddress, UINT64 qwOffset, UINT64 qwRelative)
+	{
+		ULONG ulRelativeAddress;
+		NoCRT::mem::memmove(&ulRelativeAddress, (PVOID)((UINT64)pvAddress + qwOffset), sizeof(ULONG));
+		return (PVOID)(ulRelativeAddress + (UINT64)pvAddress + qwRelative);
 	}
 }
