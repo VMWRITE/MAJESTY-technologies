@@ -3,7 +3,7 @@ Little driver for protecthion.
 The driver is still under development, so you can submit your ideas!  
 I write it's for manual map driver,because i havn't sertivicate for driver.  
 
-Version 1.1
+Version 1.2
 
 
 I try do this driver use max DKOM   
@@ -13,7 +13,9 @@ Anti-UM debug:
 2)PEPROCESS -> NoDebugInherit  
 3)PETHREAD -> HideFromDebugger(set manual like:EAC)  
 4)PEPROCESS -> InheritedFromUniqueProcessId and compare with explorer.exe  
-  
+5)Check hardware breakpoint  
+6) Set ProcessDebugPortMutex and ValidAccessMask to 0  
+
 Anti-analysis:  
 1)Check InstrumentationCallback( PEPROCESS -> Pcb -> InstrumentationCallback)  
 2)Do process proteced  
